@@ -1,43 +1,49 @@
 (() => {
   const roles = {
     architect: {
-      title: "Aman Malhotra — Software Architect",
+      title: "Aman Malhotra — Software Architect · AI Agent Reliability Lead",
       description:
-        "Aman Malhotra — Software Architect specializing in Java, Spring Boot, and cloud-native Kubernetes systems for telecom platforms.",
+        "Aman Malhotra — Software Architect and AI Agent Reliability Lead specializing in Java, Spring Boot, Kubernetes, and production-ready LLM/MCP agent workflows.",
       roleLine:
-        "<strong>Software Architect</strong> — cloud-native systems for telecom platforms",
+        "<strong>Software Architect / Solution Architect</strong> — AI Agent Reliability Lead",
       heroLede:
-        "Designing scalable microservices, Kubernetes platforms, and cloud migrations for global clients including AT&amp;T and Telstra.",
+        "Designing cloud-native telecom platforms, currently serving as AI Agent Reliability Lead for AI agents, personas, and LLM/MCP workflows.",
       resumeHref: "Aman_Malhotra_Architect.pdf",
       jobTitle: "Software Development Specialist",
-      jobOrg: "Acting Software Architect · Amdocs",
+      jobOrg: "AI Agent Reliability Lead · Acting Software Architect · Amdocs",
       currentStage:
-        'Sr. SWE / SDS · Acting Architect <span style="color:var(--steel-dark)">\'19–now</span>',
-      skillsNote: "Architecture-first view for SA roles.",
-      footerRole: "Software Architect",
+        'SDS / SSE · Acting Architect <span style="color:var(--steel-dark)">\'19–now</span>',
+      tenureNote: "Career progression to SDS / SSE, currently functioning as Acting Software Architect.",
+      skillsNote: "Architecture-first view, with current AI-agent work highlighted.",
+      footerRole: "Software Architect · AI Agent Reliability Lead",
       terminal: {
-        focus: "Software Architect",
-        lens: "solution architecture · HLD/LLD · cloud migration",
+        focus: "Software Architect · AI Agent Reliability Lead",
+        lens: "solution architecture · agent reliability · personas · MCP",
+        stack: "Java · Spring Boot · Kubernetes · Helm · PostgreSQL",
+        ai: "Cursor · LLM workflows · MCP · AI agents",
       },
     },
     specialist: {
-      title: "Aman Malhotra — Software Development Specialist",
+      title: "Aman Malhotra — SDS / SSE · AI Agent Reliability Lead",
       description:
-        "Aman Malhotra — Software Development Specialist and Senior Software Engineer building backend cloud-native systems for telecom.",
+        "Aman Malhotra — Software Development Specialist / Senior Software Engineer and AI Agent Reliability Lead building cloud-native backends and production-ready AI agents.",
       roleLine:
-        "<strong>Software Development Specialist</strong> — senior engineer for cloud-native backends",
+        "<strong>Software Development Specialist / Senior Software Engineer</strong> — AI Agent Reliability Lead",
       heroLede:
-        "Hands-on delivery of Java/Spring microservices, Kubernetes deployments, and CI/CD for high-availability telecom platforms.",
+        "Designing and delivering Java/Spring cloud-native platforms for telecom, currently serving as AI Agent Reliability Lead for agents, personas, and LLM/MCP workflows.",
       resumeHref: "Aman_Malhotra_SDS.pdf",
-      jobTitle: "Software Development Specialist",
-      jobOrg: "Senior Software Engineer · Amdocs",
+      jobTitle: "Software Development Specialist / Senior Software Engineer",
+      jobOrg: "AI Agent Reliability Lead · Amdocs",
       currentStage:
-        'Sr. Software Engineer / SDS <span style="color:var(--steel-dark)">\'19–now</span>',
-      skillsNote: "Delivery-first view for SDS / Sr. SWE roles.",
-      footerRole: "Software Development Specialist",
+        'SDS / SSE · AI Agent Reliability Lead <span style="color:var(--steel-dark)">\'19–now</span>',
+      tenureNote: "One tenure, progressive ownership — from engineer to SDS / SSE.",
+      skillsNote: "Delivery-first view, with current AI-agent work highlighted.",
+      footerRole: "SDS / SSE · AI Agent Reliability Lead",
       terminal: {
-        focus: "Software Development Specialist",
-        lens: "backend delivery · microservices · CI/CD",
+        focus: "SDS / SSE · AI Agent Reliability Lead",
+        lens: "agent reliability · personas · MCP · backend delivery",
+        stack: "Java · Spring Boot · Kubernetes · Helm · PostgreSQL",
+        ai: "Cursor · LLM workflows · MCP · AI agents",
       },
     },
   };
@@ -45,6 +51,13 @@
   const body = document.body;
   const terminal = document.getElementById("terminal");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function roleFromPath() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    if (parts.includes("architect")) return "architect";
+    if (parts.includes("specialist")) return "specialist";
+    return null;
+  }
 
   function roleFromUrl() {
     const q = new URLSearchParams(window.location.search).get("role");
@@ -56,30 +69,18 @@
   }
 
   function detectRole() {
-    const role = roleFromUrl();
-    if (role) return role;
-    const hash = window.location.hash.replace("#", "").toLowerCase();
-    if (hash === "specialist") return "specialist";
-    if (hash === "architect") return "architect";
-    return localStorage.getItem("portfolio-role") || "architect";
+    return roleFromPath() || roleFromUrl() || "specialist";
   }
 
-  function setRole(role, { persist = true, animateTerminal = true, focused = Boolean(roleFromUrl()) } = {}) {
+  function setRole(role, { animateTerminal = true } = {}) {
     const data = roles[role];
     if (!data) return;
 
     body.dataset.role = role;
-    if (focused) body.dataset.focusedRoleLink = "true";
-    else delete body.dataset.focusedRoleLink;
-    if (persist) localStorage.setItem("portfolio-role", role);
 
     document.title = data.title;
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute("content", data.description);
-
-    document.querySelectorAll("[data-role-btn]").forEach((btn) => {
-      btn.setAttribute("aria-pressed", String(btn.dataset.roleBtn === role));
-    });
 
     document.querySelectorAll(".summary-block, .bullets-role").forEach((el) => {
       el.classList.toggle("is-active", el.dataset.role === role);
@@ -91,6 +92,7 @@
       jobTitle: data.jobTitle,
       jobOrg: data.jobOrg,
       currentStage: data.currentStage,
+      tenureNote: data.tenureNote,
       skillsNote: data.skillsNote,
       footerRole: data.footerRole,
     };
@@ -105,7 +107,6 @@
       el.setAttribute("href", data.resumeHref);
     });
 
-    // Reorder skill groups: architecture first for SA, languages first for SDS
     const skillsRoot = document.querySelector(".skills-layout > div");
     if (skillsRoot) {
       const arch = skillsRoot.querySelector('[data-skill-order="architecture"]');
@@ -115,11 +116,6 @@
         else skillsRoot.insertBefore(arch, lang);
       }
     }
-
-    const url = new URL(window.location.href);
-    if (role === "specialist") url.searchParams.set("role", role);
-    else url.searchParams.delete("role");
-    window.history.replaceState({}, "", url);
 
     if (animateTerminal) runTerminal(data);
   }
@@ -134,13 +130,16 @@
         html: `<span class="key">focus</span>   <span class="accent">${data.terminal.focus}</span>`,
       },
       {
-        html: '<span class="key">stack</span>   <span class="val">Java · Spring Boot · Kubernetes · AWS · Azure</span>',
+        html: `<span class="key">stack</span>   <span class="val">${data.terminal.stack}</span>`,
       },
       {
         html: `<span class="key">lens</span>    <span class="val">${data.terminal.lens}</span>`,
       },
       {
-        html: '<span class="key">impact</span>  <span class="val">11+ yrs · 40% cost cut · 22 engineers led</span>',
+        html: `<span class="key">AI</span>      <span class="val">${data.terminal.ai}</span>`,
+      },
+      {
+        html: '<span class="key">impact</span>  <span class="val">ODO · Telstra · EKS→AKS · −40% cost</span>',
       },
     ];
 
@@ -166,11 +165,23 @@
     setTimeout(step, 280);
   }
 
-  document.querySelectorAll("[data-role-btn]").forEach((btn) => {
-    btn.addEventListener("click", () => setRole(btn.dataset.roleBtn, { focused: false }));
+  const tabs = Array.from(document.querySelectorAll(".project-tab"));
+  const panels = Array.from(document.querySelectorAll(".project-panels .project"));
+  function showProject(id) {
+    tabs.forEach((tab) => {
+      const on = tab.getAttribute("aria-controls") === id;
+      tab.setAttribute("aria-selected", String(on));
+    });
+    panels.forEach((panel) => {
+      const on = panel.id === id;
+      panel.toggleAttribute("hidden", !on);
+      panel.classList.toggle("is-active", on);
+    });
+  }
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => showProject(tab.getAttribute("aria-controls")));
   });
 
-  // Scroll reveal
   const reveals = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && !reduced) {
     const io = new IntersectionObserver(
@@ -189,5 +200,5 @@
     reveals.forEach((el) => el.classList.add("is-visible"));
   }
 
-  setRole(detectRole(), { persist: true, animateTerminal: true });
+  setRole(detectRole(), { animateTerminal: true });
 })();
